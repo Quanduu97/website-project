@@ -438,15 +438,17 @@ def zeige_start():
         max-width: 600px;
         position: relative;
         margin: auto;
+	height: auto;
     }}
     .mySlides {{
-        display: none;
-        border-radius: 12px;
-        box-shadow: 0 0 12px rgba(0,0,0,0.3);
-        animation: fade 1s ease-in-out;
-        width: 100%;
-        height: auto;
-        object-fit: contain;
+	display: none;
+    	width: 100%;
+    	height: auto;
+    	max-height: 80vh;
+    	object-fit: contain;
+    	border-radius: 12px;
+    	box-shadow: 0 0 12px rgba(0,0,0,0.3);
+    	margin-bottom: 20px;
     }}
     @keyframes fade {{
         from {{ opacity: 0.4 }} 
@@ -474,7 +476,7 @@ def zeige_start():
     </script>
     """
 
-    html(html_code, height=500)
+    html(html_code, height=600)
 	
 
 
