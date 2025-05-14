@@ -1,50 +1,8 @@
 import streamlit as st
 import os
 
-
-# Seiteneinstellungen und Layout
-st.set_page_config(page_title = "Unsere App", layout = "wide")
-
-# Seitenleiste mit Menü-Navigation
-auswahl = st.sidebar.radio("Menü", ["❤️Start", "⏰Zeitstrahl", "☀️Aktivitäten", "📍Aktivitäten in unserer Nähe", "🥘Rezepte-Planer"])
-
-def get_github_bild_url(dateiname):
-    return f"https://raw.githubusercontent.com/Quanduu97/website-project/main/bilder/{dateiname}"
-
-
-# Funktionen für die verschiedenen Seiten
-def zeige_start():
-    
-    # Überschrift der Seite
-    st.markdown("""
-                <h1 style = 'color: #ffffff;'> 💌 Willkommen auf unserer Seite 🥞 </h1>""", unsafe_allow_html=True)
-    st.markdown("""
-                Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meiner Fehler zu verbessern. 
-                Ein bisschen eine Unterstützung für mich und uns, damit ich es für uns besser machen kann. ❤️""")
-    
-    # Info-Text
-    st.info("""Kleine Info - ich bin noch nicht komplett fertig, aber ich wollte dir schonmal zeigen, an was ich weiterarbeiten werde :)
-            \nIch weiß auch, dass du gerade Abstand haben möchtest. Aber vielleicht zeigt dir das ein wenig, dass ich mich wirklich reinhängen möchte\n
-            \nIch glaube einfach an uns 🥹\n""")
-    
-    # Seitentrenner
-    st.markdown("---")
-
-    # Diashow der Zeitstrahl-Fotos
-    st.markdown("""
-                <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
-                Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
-
-
-def zeige_zeitstrahl():
-    st.title("Zeitstrahl")
-    st.info("""Hello ❤️ \
-    \n\nIch habe für uns einen kleinen Zeitstrahl entworfen, der unsere gesamte Zeit etwas widerspiegelt. Ich hoffe, dass dich das ein bisschen erinnern lässt, was wir alles so gemacht haben, was wir erlebt haben, zusammen geschafft haben und warum wir so ein gutes Team sind. \
-    Ich würde mich freuen, wenn du dir den ganzen Zeitstrahl durchlesen würdest. Und vielleicht ist das ein kleiner Denkanstoß, ob sich unsere Beziehung für dich und uns vielleicht doch noch lohnt. Ich hoffe es. \
-    \n\nIch hoffe, dass du Spaß daran hast eine kleine Zeitreise zu erleben. Ich hatte sehr viel Spaß mir all das nochmal anzuschauen. Ich liebe dich ❤️🥞""")
-
-    # Momente
-    zeitstrahl = [
+# Momente
+zeitstrahl = [
 {"datum": "24.01.2022",
          "titel": "Match",
          "text": "Ich weiß nicht, ob es wirklich genau an diesem Tag war, aber das sind die ersten Nachrichten, die ich von dir gescreenshottet habe. Ich bin so unendlich froh, dass ich zu der Zeit nach recht gewischt habe, um dich treffen zu dürfen. Auch wenn wir diese Story nicht immer als Kennenlerngeschichte erzählen wollen, weil sie nicht ganz so romantisch ist, bin ich trotzdem sehr dankbar, dass ich dich auf diese Weise kennenlernen durfte.",
@@ -434,6 +392,49 @@ def zeige_zeitstrahl():
          "text": "Unser letztes Bild.. Es tut wieder so weh das zu sehen und das hier jetzt zu schreiben. Ich habe mir auf dieser Hochzeit so sehr gewünscht, dass wir das auch irgendwann haben können. Ich habe dich während der gesamten Trauung angeschaut und mir vorgestellt, wie es mit dir wäre. Und ich dachte einfach nur, dass es wunderschön wäre. Was ich alles dafür tun würde, irgendwann die Chance zu haben, dich zu heiraten. Mit dir eine Zukunft aufzubauen. Eine Familie zu haben. Das wäre so ein schönes Leben, ein besseres hätte ich mir nie vorstellen können. Deswegen tut es umso mehr weh, dass das unser letztes Bild ist. Und ich hoffe so sehr, dass es nicht das letzte bleiben wird. Sondern, dass wir noch viel mehr Bilder machen können, die irgendwann in diesem Zeitstrahl angehangen werden können. Ich bitte dich so sehr darum, dass du uns diese Möglichkeit gibst. Bitte. Ich liebe dich❤️🥞",
          "bild": "94_Our_last_Pic.jpg"}
     ]
+
+# Seiteneinstellungen und Layout
+st.set_page_config(page_title = "Unsere App", layout = "wide")
+
+# Seitenleiste mit Menü-Navigation
+auswahl = st.sidebar.radio("Menü", ["❤️Start", "⏰Zeitstrahl", "☀️Aktivitäten", "📍Aktivitäten in unserer Nähe", "🥘Rezepte-Planer"])
+
+def get_github_bild_url(dateiname):
+    return f"https://raw.githubusercontent.com/Quanduu97/website-project/main/bilder/{dateiname}"
+
+
+# Funktionen für die verschiedenen Seiten
+def zeige_start():
+    
+    # Überschrift der Seite
+    st.markdown("""
+                <h1 style = 'color: #ffffff;'> 💌 Willkommen auf unserer Seite 🥞 </h1>""", unsafe_allow_html=True)
+    st.markdown("""
+                Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meiner Fehler zu verbessern. 
+                Ein bisschen eine Unterstützung für mich und uns, damit ich es für uns besser machen kann. ❤️""")
+    
+    # Info-Text
+    st.info("""Kleine Info - ich bin noch nicht komplett fertig, aber ich wollte dir schonmal zeigen, an was ich weiterarbeiten werde :)
+            \nIch weiß auch, dass du gerade Abstand haben möchtest. Aber vielleicht zeigt dir das ein wenig, dass ich mich wirklich reinhängen möchte\n
+            \nIch glaube einfach an uns 🥹\n""")
+    
+    # Seitentrenner
+    st.markdown("---")
+
+    # Diashow der Zeitstrahl-Fotos
+    st.markdown("""
+                <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
+                Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
+
+
+def zeige_zeitstrahl():
+    st.title("Zeitstrahl")
+    st.info("""Hello ❤️ \
+    \n\nIch habe für uns einen kleinen Zeitstrahl entworfen, der unsere gesamte Zeit etwas widerspiegelt. Ich hoffe, dass dich das ein bisschen erinnern lässt, was wir alles so gemacht haben, was wir erlebt haben, zusammen geschafft haben und warum wir so ein gutes Team sind. \
+    Ich würde mich freuen, wenn du dir den ganzen Zeitstrahl durchlesen würdest. Und vielleicht ist das ein kleiner Denkanstoß, ob sich unsere Beziehung für dich und uns vielleicht doch noch lohnt. Ich hoffe es. \
+    \n\nIch hoffe, dass du Spaß daran hast eine kleine Zeitreise zu erleben. Ich hatte sehr viel Spaß mir all das nochmal anzuschauen. Ich liebe dich ❤️🥞""")
+
+   
 
     for eintrag in zeitstrahl:
         st.markdown(f"### {eintrag['titel']} ({eintrag['datum']})")
