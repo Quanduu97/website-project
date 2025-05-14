@@ -432,11 +432,12 @@ def zeige_start():
     for eintrag in zeitstrahl:
         bild_url = get_github_bild_url(eintrag["bild"])
 
-        platzhalter.markdown(f"""
-        <div style='text-align: center;'>
-            <img src='{bild_url}' style='width: 400px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.15);' />
-        </div>
-        """, unsafe_allow_html=True)
+	with platzhalter.container()
+        	st.markdown(f"""
+        	<div style='text-align: center;'>
+            	<img src='{bild_url}' style='width: 400px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.15);' />
+        	</div>
+        	""", unsafe_allow_html=True)
 
         time.sleep(3)
 
