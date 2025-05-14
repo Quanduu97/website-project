@@ -412,7 +412,7 @@ def zeige_start():
     st.markdown("""
                 <h1 style = 'color: #ffffff;'> 💌 Willkommen auf unserer Seite 🥞 </h1>""", unsafe_allow_html=True)
     st.markdown("""
-                Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meiner Fehler zu verbessern. 
+                Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meine Fehler zu verbessern. 
                 Ein bisschen eine Unterstützung für mich und uns, damit ich es für uns besser machen kann. ❤️""")
     
     # Info-Text
@@ -428,10 +428,10 @@ def zeige_start():
                 <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
                 Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
 
-    # Liste der Bild-URLs
+        # Liste aller Bild-URLs aus dem Zeitstrahl
     bilder_urls = [get_github_bild_url(eintrag["bild"]) for eintrag in zeitstrahl]
 
-    # HTML + CSS + JS Slideshow mit Fade
+    # HTML, CSS & JS für Slideshow mit Fade-Effekt & angepasstem Bild-Styling
     html_code = f"""
     <style>
     .slideshow-container {{
@@ -445,6 +445,8 @@ def zeige_start():
         box-shadow: 0 0 12px rgba(0,0,0,0.3);
         animation: fade 1s ease-in-out;
         width: 100%;
+        height: auto;
+        object-fit: contain;
     }}
     @keyframes fade {{
         from {{ opacity: 0.4 }} 
@@ -453,27 +455,26 @@ def zeige_start():
     </style>
 
     <div class="slideshow-container">
-        {"".join([f'<img class="mySlides" src="{url}" style = max-width: 100%; height: auto;>' for url in bilder_urls])}
+        {"".join([f'<img class="mySlides" src="{url}" />' for url in bilder_urls])}
     </div>
 
     <script>
     let slideIndex = 0;
     showSlides();
     function showSlides() {{
-        let i;
         let slides = document.getElementsByClassName("mySlides");
-        for (i = 0; i < slides.length; i++) {{
-            slides[i].style.display = "none";  
+        for (let i = 0; i < slides.length; i++) {{
+            slides[i].style.display = "none";
         }}
         slideIndex++;
-        if (slideIndex > slides.length) {{ slideIndex = 1 }}    
-        slides[slideIndex - 1].style.display = "block";  
-        setTimeout(showSlides, 3000); // Wechsel alle 3 Sekunden
+        if (slideIndex > slides.length) {{ slideIndex = 1 }}
+        slides[slideIndex - 1].style.display = "block";
+        setTimeout(showSlides, 3000); // alle 3 Sekunden wechseln
     }}
     </script>
     """
 
-    html(html_code, height=400)
+    html(html_code, height=500)
 	
 
 
