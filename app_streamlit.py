@@ -426,8 +426,8 @@ def zeige_start():
     st.markdown("""
                 <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
                 Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
-	
-	for eintrag in zeitstrahl:
+
+    for eintrag in zeitstrahl:
         bild_url = get_github_bild_url(eintrag["bild"])
 
         st.markdown(f"""
