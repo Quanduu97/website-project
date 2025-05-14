@@ -439,7 +439,10 @@ def zeige_zeitstrahl():
         st.markdown(f"### {eintrag['titel']} ({eintrag['datum']})")
         bildpfad = get_github_bild_url(eintrag["bild"])
         if bildpfad:
-           st.image(bildpfad, width = 400)
+           st.markdown(f"""
+           <div style='text-align: center;'>
+           <img src='{bildpfad}' style='width: 400px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.15);' />
+           </div>""", unsafe_allow_html=True)
         else:
             st.warning(f"Bild nicht gefunden: {eintrag['bild']}")
         
