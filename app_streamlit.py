@@ -435,7 +435,7 @@ def zeige_start():
     html_code = f"""
     <style>
     .slideshow-container {{
-        max-width: 500px;
+        max-width: 600px;
         position: relative;
         margin: auto;
     }}
@@ -453,7 +453,7 @@ def zeige_start():
     </style>
 
     <div class="slideshow-container">
-        {"".join([f'<img class="mySlides" src="{url}">' for url in bilder_urls])}
+        {"".join([f'<img class="mySlides" src="{url}" style = max-width: 100%; height: auto;>' for url in bilder_urls])}
     </div>
 
     <script>
