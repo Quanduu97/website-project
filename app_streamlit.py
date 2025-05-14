@@ -427,17 +427,18 @@ def zeige_start():
                 <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
                 Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
 
+    platzhalter = st.empty()
+
     for eintrag in zeitstrahl:
         bild_url = get_github_bild_url(eintrag["bild"])
 
-        st.markdown(f"""
+        platzhalter.markdown(f"""
         <div style='text-align: center;'>
             <img src='{bild_url}' style='width: 400px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.15);' />
         </div>
         """, unsafe_allow_html=True)
 
         time.sleep(3)
-        st.empty()
 
 	
 
