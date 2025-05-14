@@ -427,20 +427,52 @@ def zeige_start():
                 <h1 style = 'color: #ffffff;'> Hier sind ein paar unserer schönsten Momente ❤️ </h1>
                 Diese ganzen Momente findest du auch auf dem Zeitstrahl. Hier sind sie in einer Diashow angeordnet""", unsafe_allow_html=True)
 
-    platzhalter = st.empty()
+    # Liste der Bild-URLs
+    bilder_urls = [get_github_bild_url(eintrag["bild"]) for eintrag in zeitstrahl]
 
-    for eintrag in zeitstrahl:
-        bild_url = get_github_bild_url(eintrag["bild"])
+    # HTML + CSS + JS Slideshow mit Fade
+    html_code = f"""
+    <style>
+    .slideshow-container {{
+        max-width: 500px;
+        position: relative;
+        margin: auto;
+    }}
+    .mySlides {{
+        display: none;
+        border-radius: 12px;
+        box-shadow: 0 0 12px rgba(0,0,0,0.3);
+        animation: fade 1s ease-in-out;
+        width: 100%;
+    }}
+    @keyframes fade {{
+        from {{ opacity: 0.4 }} 
+        to {{ opacity: 1 }}
+    }}
+    </style>
 
-	with platzhalter.container()
-        	st.markdown(f"""
-        	<div style='text-align: center;'>
-            	<img src='{bild_url}' style='width: 400px; border-radius: 12px; box-shadow: 0 0 12px rgba(0,0,0,0.15);' />
-        	</div>
-        	""", unsafe_allow_html=True)
+    <div class="slideshow-container">
+        {"".join([f'<img class="mySlides" src="{url}">' for url in bilder_urls])}
+    </div>
 
-        time.sleep(3)
+    <script>
+    let slideIndex = 0;
+    showSlides();
+    function showSlides() {{
+        let i;
+        let slides = document.getElementsByClassName("mySlides");
+        for (i = 0; i < slides.length; i++) {{
+            slides[i].style.display = "none";  
+        }}
+        slideIndex++;
+        if (slideIndex > slides.length) {{ slideIndex = 1 }}    
+        slides[slideIndex - 1].style.display = "block";  
+        setTimeout(showSlides, 3000); // Wechsel alle 3 Sekunden
+    }}
+    </script>
+    """
 
+    html(html_code, height=400)
 	
 
 
