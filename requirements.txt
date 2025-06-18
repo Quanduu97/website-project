@@ -1,8 +1,4 @@
 streamlit
-time
 openai
-datetime
-bs4
-requests_html
-collections
+requests
 serpapi
