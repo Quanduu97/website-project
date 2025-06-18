@@ -590,25 +590,35 @@ def zeige_events_per_gpt():
     events = []
 
     try:
+        search = GoogleSearch(params)
+        results = search.get_dict()
         organic_results = results.get("organic_results", [])
 
+        events = []
+
         for res in organic_results[:5]:
-            events.append({
-                "Quelle": "SerpAPI",
-                "Titel": res["title"],
-                "Datum": datetime.today().strftime("%Y-%m-%d"),
-                "Link": res["link"]
-            })
+            try:
+                title_safe = ihtml.escape(res.get("title", "Kein Titel"))
+                link_safe = ihtml.escape(res.get("link", "#"))
+
+                events.append({
+                    "Quelle": "SerpAPI",
+                    "Titel": title_safe,
+                    "Datum": datetime.today().strftime("%Y-%m-%d"),
+                    "Link": link_safe
+                })
+            except Exception as inner_e:
+                st.warning(f"⚠️ Problem beim Verarbeiten eines Events: {inner_e}")
 
         if events:
-            st.info("Leider werden hier nur die Webseiten angezeigt, auf denen man Events findet." \
-            "\n \nIch habe alles versucht..")
+            st.info("Hier sind die Links zu Webseiten mit Eventübersichten. Viel mehr kann ich leider nicht automatisch anzeigen.")
             zeige_kalender(events)
         else:
             st.warning("Keine Events gefunden.")
 
     except Exception as e:
-        st.error(f"❌ Fehler bei der GPT-Eventsuche: {str(e)}")
+        st.error("❌ Fehler bei der GPT-Eventsuche.")
+        st.text(str(e))
 
 
 def zeige_kalender(events):
