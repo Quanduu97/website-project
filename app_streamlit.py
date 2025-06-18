@@ -624,6 +624,9 @@ def zeige_kalender(events):
 def zeige_aktivitaetensuche():
     st.title("📍Aktivitätensuche in unserer Nähe")
     st.markdown("Hier findest du Events, Date-Ideen fürs Wochenende und spontane Abendvorschläge.")
+		st.info("Hier auf dieser Seite kannst du auf einen der Buttons drücken. Dadurch werden uns Vorschläge für Events sowie Date-Ideen für Wochenenden und entspannte Abende zu zweit vorgeschlagen."\
+            "\n \nNur als kleine Hilfe, falls wir mal keine Ideen haben ❤️")
+						
 
     col1, col2, col3 = st.columns(3)
     with col1:
