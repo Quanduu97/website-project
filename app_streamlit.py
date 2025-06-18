@@ -2,6 +2,19 @@ import streamlit as st
 import os
 import time
 from streamlit.components.v1 import html
+from openai import OpenAI
+from datetime import datetime, timedelta
+import requests
+from bs4 import BeautifulSoup
+from requests_html import HTMLSession
+from collections import defaultdict
+import pyventim
+import json
+from serpapi import GoogleSearch
+
+# OpenAI-API-Key aus Secrets laden (lokal oder online)
+client = OpenAI(api_key=st.secrets["openai"]["api_key"])
+serpapi_key = st.secrets["serpapi"]["serpapi_key"]
 
 # Momente
 zeitstrahl = [
@@ -513,11 +526,127 @@ def zeige_zeitstrahl():
 
                 """, unsafe_allow_html=True)
         st.markdown("---")
+
+# GPT-Antwortfunktion
+def gpt_antwort(prompt):
+    response = client.chat.completions.create(
+    model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "Du bist ein kreativer Ideenlieferant für Dates und Events."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.9,
+        max_tokens=450
+    )
+    return response.choices[0].message.content
+
+# 💡 GPT: Date-Ideen (lang = Wochenende / kurz = Abend)
+def zeige_date_ideen(lang):
+    st.subheader("💡 Date-Ideen")
+    if lang:
+        prompt = (
+            "Gib mir 5 kreative, unterschiedliche Date-Ideen fürs Wochenende. Gerne in der Nähe von Düsseldorf."
+            "Sie dürfen auch einen ganzen Tag oder eine Übernachtung umfassen. Eine Übernachtung darf maximal 3 Stunden von Düsseldorf entfernt sein (mit dem Auto)."
+            "Gebe höchstens eine Übernachtung aus."
+            "Variiere die Ideen bei jeder Anfrage."
+        )
+    else:
+        prompt = (
+            "Gib mir 5 abwechslungsreiche, kreative Date-Ideen für einen normalen Abend (ca. 2-3 Stunden). "
+            "Sie sollen romantisch, witzig oder entspannend sein. "
+            "Variiere die Ideen bei jeder Anfrage."
+        )
+    antwort = gpt_antwort(prompt)
+    st.markdown(antwort)
+
+def web_search_impl(query: str) -> dict:
+    params = {
+        "engine":       "google",
+        "q":            f"{query} site:duesseldorf",
+        "location":     "Düsseldorf, Germany",
+        "api_key":      st.secrets["search"]["serpapi_key"],
+        "num":          5
+    }
+    search = GoogleSearch(params)
+    result = search.get_dict()
+    snippets = []
+
+
+#GPT Events in der Nähe
+def zeige_events_per_gpt():
+    st.info("🔎 Suche nach aktuellen Events in Düsseldorf läuft ...")
+
+    params = {
+        "engine": "google",
+        "q": "aktuelle Veranstaltungen Düsseldorf site:mrduesseldorf.de OR site:eventbrite.de OR site:duesseldorf-tourismus.de",
+        "api_key": serpapi_key,
+        "location": "Düsseldorf, Germany",
+        "hl": "de",
+        "gl": "de",
+        "num": 10
+    }
+
+    search = GoogleSearch(params)
+    results = search.get_dict()
+
+    events = []
+
+    try:
+        organic_results = results.get("organic_results", [])
+
+        for res in organic_results[:5]:
+            events.append({
+                "Quelle": "SerpAPI",
+                "Titel": res["title"],
+                "Datum": datetime.today().strftime("%Y-%m-%d"),
+                "Link": res["link"]
+            })
+
+        if events:
+            st.info("Leider werden hier nur die Webseiten angezeigt, auf denen man Events findet." \
+            "\n \nIch habe alles versucht..")
+            zeige_kalender(events)
+        else:
+            st.warning("Keine Events gefunden.")
+
+    except Exception as e:
+        st.error(f"❌ Fehler bei der GPT-Eventsuche: {str(e)}")
+
+
+def zeige_kalender(events):
+    kalender = defaultdict(list)
+    for ev in events:
+        kalender[ev["Datum"]].append(ev)
+    for datum in sorted(kalender.keys()):
+        st.subheader(datum)
+        for ev in kalender[datum]:
+            st.markdown(f"- **{ev['Titel']}**  → [Details]({ev['Link']})  *(via {ev['Quelle']})*")
+
+
+def zeige_aktivitaetensuche():
+    st.title("📍Aktivitätensuche in unserer Nähe")
+    st.markdown("Hier findest du Events, Date-Ideen fürs Wochenende und spontane Abendvorschläge.")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("🎉 Events in der Nähe"):
+            zeige_events_per_gpt()
+
+    with col2:
+        if st.button("🌄 Date-Ideen fürs Wochenende"):
+            zeige_date_ideen(lang=True)
+
+    with col3:
+        if st.button("🌙 Date-Ideen für einen Abend"):
+            zeige_date_ideen(lang=False)
+
+    st.markdown("---")
         
 # Auswahl auswerten und Seite anzeigen
 if auswahl == "❤️Start":
     zeige_start()
 elif auswahl == "⏰Zeitstrahl":
     zeige_zeitstrahl()
-
+elif auswahl == "📍Aktivitäten in unserer Nähe":
+    zeige_aktivitaetensuche()
 
