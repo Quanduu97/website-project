@@ -6,9 +6,7 @@ import openai
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
-from requests_html import HTMLSession
 from collections import defaultdict
-import pyventim
 import json
 from serpapi import GoogleSearch
 
