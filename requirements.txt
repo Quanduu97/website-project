@@ -1,4 +1,6 @@
 streamlit
 openai
 requests
+beautifulsoup4
+requests-html
 serpapi
