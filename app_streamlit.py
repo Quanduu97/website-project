@@ -535,7 +535,7 @@ def gpt_antwort(prompt):
             {"role": "user", "content": prompt}
         ],
         temperature=0.9,
-        max_tokens=450
+        max_tokens=800
     )
     return response.choices[0].message.content
 
