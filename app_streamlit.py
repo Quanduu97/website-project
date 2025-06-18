@@ -528,7 +528,7 @@ def zeige_zeitstrahl():
 
 # GPT-Antwortfunktion
 def gpt_antwort(prompt):
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
     model="gpt-4o",
         messages=[
             {"role": "system", "content": "Du bist ein kreativer Ideenlieferant für Dates und Events."},
