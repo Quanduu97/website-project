@@ -426,7 +426,6 @@ def zeige_start():
     st.markdown("""
                 Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meine Fehler zu verbessern. 
                 Ein bisschen eine Unterstützung für mich und uns, damit ich es für uns besser machen kann. ❤️""")
-    st.info("Falls du das hier neu anschaust: Der Tab 📍Aktivitäten ist fertig. Leider ging es nicht viel besser, hab wirklich viel probiert🥹")
     # Info-Text
     st.info("""Kleine Info - ich bin noch nicht komplett fertig, aber ich wollte dir schonmal zeigen, an was ich weiterarbeiten werde :)
             \nIch weiß auch, dass du gerade Abstand haben möchtest. Aber vielleicht zeigt dir das ein wenig, dass ich mich wirklich reinhängen möchte\n
