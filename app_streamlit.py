@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import time
 from streamlit.components.v1 import html
-from openai import OpenAI
+import openai
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
@@ -13,7 +13,7 @@ import json
 from serpapi import GoogleSearch
 
 # OpenAI-API-Key aus Secrets laden (lokal oder online)
-client = OpenAI(api_key=st.secrets["openai"]["api_key"])
+openai.api_key = st.secrets["openai"]["api_key"]
 serpapi_key = st.secrets["serpapi"]["serpapi_key"]
 
 # Momente
@@ -412,7 +412,7 @@ zeitstrahl = [
 st.set_page_config(page_title = "Unsere App", layout = "wide")
 
 # Seitenleiste mit Menü-Navigation
-auswahl = st.sidebar.radio("Menü", ["❤️Start", "⏰Zeitstrahl", "☀️Aktivitäten", "📍Aktivitäten in unserer Nähe", "🥘Rezepte-Planer"])
+auswahl = st.sidebar.radio("Menü", ["❤️Start", "⏰Zeitstrahl", "📍Aktivitäten in unserer Nähe", "🥘Rezepte-Planer"])
 
 def get_github_bild_url(dateiname):
     return f"https://raw.githubusercontent.com/Quanduu97/website-project/main/bilder/{dateiname}"
@@ -529,7 +529,7 @@ def zeige_zeitstrahl():
 
 # GPT-Antwortfunktion
 def gpt_antwort(prompt):
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
     model="gpt-4o",
         messages=[
             {"role": "system", "content": "Du bist ein kreativer Ideenlieferant für Dates und Events."},
