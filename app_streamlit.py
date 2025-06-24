@@ -569,23 +569,40 @@ def gpt_antwort(prompt):
     return response.choices[0].message.content
 
 # 💡 GPT: Date-Ideen (lang = Wochenende / kurz = Abend)
-def zeige_date_ideen(lang):
-    st.subheader("💡 Date-Ideen")
+def zeige_date_ideen(lang: bool):
+    """Zeigt kreative GPT-generierte Date-Ideen – und speichert sie dauerhaft in session_state."""
+
+    # Den richtigen Schlüssel je nach Variante wählen
+    key = "ideen_lang" if lang else "ideen_kurz"
+
+    # Prompt definieren
     if lang:
         prompt = (
-            "Gib mir 5 kreative, unterschiedliche Date-Ideen fürs Wochenende. Gerne in der Nähe von Düsseldorf."
-            "Sie dürfen auch einen ganzen Tag oder eine Übernachtung umfassen. Eine Übernachtung darf maximal 3 Stunden von Düsseldorf entfernt sein (mit dem Auto)."
-            "Gebe höchstens eine Übernachtung aus."
-            "Variiere die Ideen bei jeder Anfrage."
+            "Gib mir 5 kreative, unterschiedliche Date-Ideen fürs Wochenende. Gerne in der Nähe von Düsseldorf. "
+            "Sie dürfen auch einen ganzen Tag oder eine Übernachtung umfassen. "
+            "Eine Übernachtung darf maximal 3 Stunden von Düsseldorf entfernt sein (mit dem Auto). "
+            "Gebe höchstens eine Übernachtung aus. Variiere die Ideen bei jeder Anfrage."
         )
+        überschrift = "💡 Date-Ideen fürs Wochenende"
     else:
         prompt = (
             "Gib mir 5 abwechslungsreiche, kreative Date-Ideen für einen normalen Abend (ca. 2-3 Stunden). "
-            "Sie sollen romantisch, witzig oder entspannend sein. "
-            "Variiere die Ideen bei jeder Anfrage."
+            "Sie sollen romantisch, witzig oder entspannend sein. Variiere die Ideen bei jeder Anfrage."
         )
-    antwort = gpt_antwort(prompt)
-    st.markdown(antwort)
+        überschrift = "💡 Date-Ideen für einen Abend"
+
+    # GPT-Antwort nur einmal holen und speichern
+    if key not in st.session_state:
+        st.session_state[key] = gpt_antwort(prompt)
+
+    # Immer anzeigen
+    st.subheader(überschrift)
+    st.markdown(st.session_state[key])
+
+    # ── manueller Refresh-Button ────────────────────────────────────────────
+    if st.button("🔄 Neue Ideen laden", key=f"refresh_{key}"):
+        st.session_state.pop(key)           # Cache leeren
+        st.rerun()             # Seite neu rendern
 
 def web_search_impl(query: str) -> dict:
     params = {
@@ -710,13 +727,24 @@ def zeige_aktivitaetensuche():
         if st.button("🎉 Events in der Nähe"):
             zeige_events_per_gpt()
 
+    clicked_weekend = False
+    clicked_evening = False
+
     with col2:
         if st.button("🌄 Date-Ideen fürs Wochenende"):
+            clicked_weekend = True
             zeige_date_ideen(lang=True)
 
     with col3:
         if st.button("🌙 Date-Ideen für einen Abend"):
+            clicked_evening = True
             zeige_date_ideen(lang=False)
+
+    if not clicked_weekend and "ideen_lang" in st.session_state:
+        zeige_date_ideen(lang=True)
+
+    if not clicked_evening and "ideen_kurz" in st.session_state:
+        zeige_date_ideen(lang=False)
 
     st.markdown("---")
 
