@@ -725,7 +725,7 @@ def zeige_aktivitaetensuche():
     idee_text   = st.text_input("Date‑Idee eingeben")
     kategorie   = st.selectbox(
         "Kategorie",
-        ["Top‑Ideen", "Schöne Optionen", "Locker & Spontan"],
+        ["Top‑Ideen", "Schöne Optionen", "Nette Option"],
         index=1,
     )
 
@@ -745,7 +745,7 @@ def zeige_aktivitaetensuche():
     spalten = {
         "Top‑Ideen":       {"farbe": "#6ff147"},
         "Schöne Optionen": {"farbe": "#ffe81a"},
-        "Locker & Spontan":{"farbe": "#ff9a3b"},
+        "Nette Option":{"farbe": "#ff9a3b"},
     }
 
     col_objs = st.columns(3)
