@@ -5,3 +5,5 @@ beautifulsoup4
 requests-html
 google-search-results
 pyairtable
+lxml
+lxml-html-clean
