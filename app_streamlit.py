@@ -678,7 +678,6 @@ def zeige_events_per_gpt():
 
 
 
-
 def add_idee(idee_text: str, kategorie: str):
     """Neuen Datensatz anlegen."""
     table.create(
