@@ -7,13 +7,30 @@ import openai
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
+from requests_html import HTMLSession
 from collections import defaultdict
+import pyventim
 import json
 from serpapi import GoogleSearch
+from pyairtable import Api
 
 # OpenAI-API-Key aus Secrets laden (lokal oder online)
 openai.api_key = st.secrets["openai"]["api_key"]
 serpapi_key = st.secrets["serpapi"]["serpapi_key"]
+airtable_api_key = st.secrets["airtable"]["airtable_key"]
+airtable_base_id = st.secrets["airtable"]["base_id"]
+airtable_table_name = st.secrets["airtable"]["table_name"]
+
+def get_airtable_table():
+    api_key   = airtable_api_key
+    base_id   = airtable_base_id
+    table_name = airtable_table_name
+    api = Api(api_key)          # neues Einstiegs‑Objekt
+    base = api.base(base_id)    # Base‑Handle
+    return base.table(table_name)
+
+# globales Table‑Objekt (wird nur einmal pro Session erzeugt)
+table = get_airtable_table()
 
 # Momente
 zeitstrahl = [
@@ -407,6 +424,17 @@ zeitstrahl = [
          "bild": "94_Our_last_Pic.jpg"}
     ]
 
+
+def erledige_date(idx:int):
+    """Eintrag in 'gemachte_dates' verschieben + Bewertungs-Modal öffnen."""
+    # 1) Element aus der Ideen-Liste holen …
+    eintrag = st.session_state.date_ideen.pop(idx)
+    # 2) … vorläufig in gemachte_dates übernehmen
+    eintrag["bewertung"] = None          # noch keine Sterne
+    st.session_state.gemachte_dates.append(eintrag)
+    # 3) Index merken → Modal gleich öffnen
+    st.session_state.modal_index = len(st.session_state.gemachte_dates) - 1
+
 # Seiteneinstellungen und Layout
 st.set_page_config(page_title = "Unsere App", layout = "wide")
 
@@ -426,6 +454,9 @@ def zeige_start():
     st.markdown("""
                 Ich hoffe es gefällt dir. Ich versuche hiermit ein paar unserer Momente zu zeigen und auch meine Fehler zu verbessern. 
                 Ein bisschen eine Unterstützung für mich und uns, damit ich es für uns besser machen kann. ❤️""")
+    
+    st.info("Falls du das hier neu anschaust: Der Tab Aktivitäten in der Nähe ist fertig. Leider ging es nicht viel besser, hab wirklich viel probiert🥹")
+
     # Info-Text
     st.info("""Kleine Info - ich bin noch nicht komplett fertig, aber ich wollte dir schonmal zeigen, an was ich weiterarbeiten werde :)
             \nIch weiß auch, dass du gerade Abstand haben möchtest. Aber vielleicht zeigt dir das ein wenig, dass ich mich wirklich reinhängen möchte\n
@@ -534,7 +565,7 @@ def gpt_antwort(prompt):
             {"role": "user", "content": prompt}
         ],
         temperature=0.9,
-        max_tokens=800
+        max_tokens=450
     )
     return response.choices[0].message.content
 
@@ -568,6 +599,15 @@ def web_search_impl(query: str) -> dict:
     search = GoogleSearch(params)
     result = search.get_dict()
     snippets = []
+
+def zeige_kalender(events):
+    kalender = defaultdict(list)
+    for ev in events:
+        kalender[ev["Datum"]].append(ev)
+    for datum in sorted(kalender.keys()):
+        st.subheader(datum)
+        for ev in kalender[datum]:
+            st.markdown(f"- **{ev['Titel']}**  → [Details]({ev['Link']})  *(via {ev['Quelle']})*")
 
 
 #GPT Events in der Nähe
@@ -621,14 +661,43 @@ def zeige_events_per_gpt():
         st.text(str(e))
 
 
-def zeige_kalender(events):
-    kalender = defaultdict(list)
-    for ev in events:
-        kalender[ev["Datum"]].append(ev)
-    for datum in sorted(kalender.keys()):
-        st.subheader(datum)
-        for ev in kalender[datum]:
-            st.markdown(f"- **{ev['Titel']}**  → [Details]({ev['Link']})  *(via {ev['Quelle']})*")
+
+
+def add_idee(idee_text: str, kategorie: str):
+    """Neuen Datensatz anlegen."""
+    table.create(
+        {
+            "Idee": idee_text,
+            "Kategorie": kategorie,
+            "Gemacht": False,
+            "Bewertung": None,
+        }
+    )
+
+
+def get_all_records():
+    """Alle Datensätze als Liste liefern."""
+    return table.all()  # jede Zeile: {"id": .., "fields": {...}}
+
+
+def mark_as_done(rec_id: str):
+    table.update(rec_id, {"Gemacht": True})
+
+
+def restore_idee(rec_id: str):
+    table.update(rec_id, {"Gemacht": False})
+
+
+def delete_idee(rec_id: str):
+    table.delete(rec_id)
+
+
+def set_rating(rec_id: str, sterne: int):
+    table.update(rec_id, {"Bewertung": sterne})
+
+
+def delete_rating(rec_id: str):
+    table.update(rec_id, {"Bewertung": None})
 
 
 def zeige_aktivitaetensuche():
@@ -651,6 +720,119 @@ def zeige_aktivitaetensuche():
             zeige_date_ideen(lang=False)
 
     st.markdown("---")
+
+    st.markdown("### 📝 Eigene Date-Idee eintragen")
+
+    idee_text   = st.text_input("Date‑Idee eingeben")
+    kategorie   = st.selectbox(
+        "Kategorie",
+        ["Top‑Ideen", "Schöne Optionen", "Locker & Spontan"],
+        index=1,
+    )
+
+    if st.button("➕ Hinzufügen", disabled=not idee_text.strip()):
+        add_idee(idee_text.strip(), kategorie)
+        st.success("Idee gespeichert!")
+        st.rerun()
+
+    # --- Alle Datensätze laden ------------------------------------------------
+    records = get_all_records()
+    offen   = [r for r in records if not r["fields"].get("Gemacht", False)]
+    erledigt = [r for r in records if r["fields"].get("Gemacht", False)]
+
+    # --- Anzeige: Offene Ideen in 3 Spalten -----------------------------------
+    st.markdown("### 💡 Unsere gesammelten Ideen")
+
+    spalten = {
+        "Top‑Ideen":       {"farbe": "#6ff147"},
+        "Schöne Optionen": {"farbe": "#ffe81a"},
+        "Locker & Spontan":{"farbe": "#ff9a3b"},
+    }
+
+    col_objs = st.columns(3)
+    for (cat, meta), column in zip(spalten.items(), col_objs):
+        with column:
+            st.markdown(
+                f"<div style='background:{meta['farbe']};padding:10px;border-radius:8px;text-align:center;font-size:26px;"
+                "color:white;text-shadow:1px 1px 2px black;font-weight:bold;'>"
+                f"{cat}</div>",
+                unsafe_allow_html=True,
+            )
+            st.markdown("---")
+
+            cat_records = [r for r in offen if r["fields"].get("Kategorie") == cat]
+            for r in cat_records:
+                rid   = r["id"]
+                idee  = r["fields"].get("Idee", "")
+
+                txt_col, done_col, del_col = st.columns([10,1,1], gap="medium")
+                with txt_col:
+                    st.markdown(f"<div style='font-size:22px;font-weight:bold;'>{idee}</div>", unsafe_allow_html=True)
+                with done_col:
+                    if st.button("✅", key=f"done_{rid}", help="Als erledigt markieren", use_container_width=True):
+                        mark_as_done(rid)
+                        st.rerun()
+                with del_col:
+                    if st.button("🗑️", key=f"del_{rid}", help="Löschen", use_container_width=True):
+                        delete_idee(rid)
+                        st.rerun()
+
+    # --- Abschnitt: erledigte Dates ------------------------------------------
+    st.markdown("---")
+    st.markdown("### ✅ Dates, die wir schon gemacht haben")
+
+    for r in erledigt:
+        rid   = r["id"]
+        f     = r["fields"]
+        idee  = f.get("Idee", "")
+        rating = int(f.get("Bewertung") or 0)
+        sterne = "⭐"*rating if rating else "—"
+
+        col1, col2 = st.columns([5,2])
+        with col1:
+            st.markdown(f"<div style='font-size:22px;font-weight:bold;'>{idee}</div>", unsafe_allow_html=True)
+            st.markdown(f"Bewertung: {sterne}")
+            st.markdown("---")
+
+        with col2:
+            b_restore, b_rate, b_del = st.columns(3)
+            with b_restore:
+                if st.button("↩️", key=f"restore_{rid}", help="Zurückholen", use_container_width=True):
+                    restore_idee(rid)
+                    st.rerun()
+            with b_rate:
+                if st.button("⭐", key=f"bew_{rid}", help="Bewerten", use_container_width=True):
+                    st.session_state["rate_target"] = rid
+                    st.rerun()
+            with b_del:
+                if st.button("🗑️", key=f"del_done_{rid}", help="Löschen", use_container_width=True):
+                    delete_idee(rid)
+                    st.rerun()
+
+    # --- Bewertungs‑Pop‑Up ----------------------------------------------------
+    if "rate_target" in st.session_state:
+        target_id = st.session_state["rate_target"]
+        target_rec = next((rec for rec in erledigt if rec["id"] == target_id), None)
+        if target_rec:
+            with st.expander("⭐ Date bewerten (klicken zum Öffnen / Schließen)", expanded=True):
+                st.write("Wie hat dir das Date gefallen?")
+                cols = st.columns(6)
+                for i in range(5):
+                    with cols[i]:
+                        if st.button("⭐", key=f"rate_{target_id}_{i+1}", help=f"{i+1} Sterne", use_container_width=True):
+                            set_rating(target_id, i+1)
+                            st.session_state.pop("rate_target")
+                            st.success("Bewertung gespeichert!")
+                            st.rerun()
+                with cols[5]:
+                    if st.button("🗑️", key=f"clr_{target_id}", help="Bewertung löschen", use_container_width=True):
+                        delete_rating(target_id)
+                        st.session_state.pop("rate_target")
+                        st.info("Bewertung gelöscht")
+                        st.rerun()
+
+
+
         
 # Auswahl auswerten und Seite anzeigen
 if auswahl == "❤️Start":
@@ -659,4 +841,3 @@ elif auswahl == "⏰Zeitstrahl":
     zeige_zeitstrahl()
 elif auswahl == "📍Aktivitäten":
     zeige_aktivitaetensuche()
-
