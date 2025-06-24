@@ -9,7 +9,6 @@ import requests
 from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from collections import defaultdict
-import pyventim
 import json
 from serpapi import GoogleSearch
 from pyairtable import Api
